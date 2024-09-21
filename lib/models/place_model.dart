@@ -11,7 +11,7 @@ class PlaceModel {
       required this.longitude});
   static List<PlaceModel> places = [
     PlaceModel(
-        id: 2,
+        id: 1,
         name: 'The child museum',
         latitude: 30.102963679661965,
         longitude: 31.33728630920912),

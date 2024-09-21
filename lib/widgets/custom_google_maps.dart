@@ -18,7 +18,7 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   void initState() {
     // initialCameraPosition is the initial position of the camera when the map is loaded
     initialCameraPosition = const CameraPosition(
-      target: LatLng(30.112653392692135, 31.344195679445313),
+      target: LatLng(30.112378534699047, 31.343872088042776),
       // zoom level of the map when it is loaded
       /* zoom levels :
     1) World view zoom : 0 => 3
@@ -27,9 +27,12 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
     4) street view zoom : 13 => 17
     5) building view zoom : 18 => 20
     */
-      zoom: 16,
+      zoom: 12,
     );
     initMarkers();
+    initPolyLines();
+    initPolygons();
+    initCircles();
     super.initState();
   }
 
@@ -40,13 +43,19 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   }
 
   Set<Marker> markers = {};
+  Set<Polyline> polylines = {};
+  Set<Polygon> polygons = {};
+  Set<Circle> circles = {};
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         GoogleMap(
+          polygons: polygons,
+          polylines: polylines,
           zoomControlsEnabled: false,
           markers: markers,
+          circles: circles,
           // cameraTargetBounds is the bounds of the camera target. The camera target cannot go outside these bounds.
           // cameraTargetBounds: CameraTargetBounds(
           //   LatLngBounds(
@@ -80,7 +89,7 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
   void initMarkers() async {
     var customMarkerIcon = BitmapDescriptor.bytes(
-      await getImageData(image: 'asset/images/location.png', width: 40),
+      await getImageData(image: 'asset/images/location.png', width: 20),
     );
     var myMarkers = PlaceModel.places
         .map(
@@ -99,5 +108,54 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
         .toSet();
     markers.addAll(myMarkers);
     setState(() {});
+  }
+
+  void initPolyLines() async {
+    Polyline polyline = const Polyline(
+      // zIndex is the order of the polyline in the map
+      zIndex: 1,
+      // geodesic is a boolean that make the polyline follow the curvature of the earth
+      geodesic: true,
+      width: 5,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+      polylineId: PolylineId('1'),
+      color: Colors.purple,
+      points: [
+        LatLng(30.12848429643792, 31.65431208748853),
+        LatLng(30.117651271146364, 31.667823057499746),
+      ],
+    );
+    polylines.add(polyline);
+  }
+
+  void initPolygons() {
+    Polygon polygon = Polygon(
+      // we can use holes to create a polygon with a hole in the middle
+      polygonId: const PolygonId('1'),
+      points: const [
+        LatLng(30.10345409626631, 31.337994882058638),
+        LatLng(30.103899618935085, 31.302031824997105),
+        LatLng(30.14458221838534, 31.320056269018508),
+        LatLng(30.133596599034323, 31.38460094473021),
+        LatLng(30.10345409626631, 31.337994882058638),
+      ],
+      strokeWidth: 2,
+      strokeColor: Colors.red,
+      fillColor: Colors.blue.withOpacity(0.5),
+    );
+    polygons.add(polygon);
+  }
+
+  void initCircles() {
+    Circle circle = Circle(
+      circleId: const CircleId('1'),
+      center: const LatLng(30.092455778679195, 31.347928443506724),
+      radius: 1000,
+      strokeWidth: 2,
+      strokeColor: Colors.red,
+      fillColor: Colors.deepPurple.withOpacity(0.5),
+    );
+    circles.add(circle);
   }
 }
