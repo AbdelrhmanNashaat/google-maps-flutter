@@ -48,28 +48,24 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   Set<Circle> circles = {};
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GoogleMap(
-          polygons: polygons,
-          polylines: polylines,
-          zoomControlsEnabled: false,
-          markers: markers,
-          circles: circles,
-          // cameraTargetBounds is the bounds of the camera target. The camera target cannot go outside these bounds.
-          // cameraTargetBounds: CameraTargetBounds(
-          //   LatLngBounds(
-          //     southwest: const LatLng(29.96466663084121, 31.185872552967002),
-          //     northeast: const LatLng(30.065059815029187, 31.27657462441701),
-          //   ),
-          // ),
-          initialCameraPosition: initialCameraPosition,
-          onMapCreated: (GoogleMapController controller) {
-            //Initializes the controller once the map is created
-            mapController = controller;
-          },
-        ),
-      ],
+    return GoogleMap(
+      polygons: polygons,
+      polylines: polylines,
+      zoomControlsEnabled: false,
+      markers: markers,
+      circles: circles,
+      // cameraTargetBounds is the bounds of the camera target. The camera target cannot go outside these bounds.
+      // cameraTargetBounds: CameraTargetBounds(
+      //   LatLngBounds(
+      //     southwest: const LatLng(29.96466663084121, 31.185872552967002),
+      //     northeast: const LatLng(30.065059815029187, 31.27657462441701),
+      //   ),
+      // ),
+      initialCameraPosition: initialCameraPosition,
+      onMapCreated: (GoogleMapController controller) {
+        //Initializes the controller once the map is created
+        mapController = controller;
+      },
     );
   }
 
