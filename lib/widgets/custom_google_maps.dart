@@ -17,6 +17,7 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   late CameraPosition initialCameraPosition;
   GoogleMapController? mapController;
   late LocationServices locationServices;
+  bool isFirstTime = true;
   @override
   void initState() {
     // initialCameraPosition is the initial position of the camera when the map is loaded
@@ -175,13 +176,22 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   }
 
   void animateCamera(LocationData locationData) {
-    var cameraPosition = CameraPosition(
-      target: LatLng(locationData.latitude!, locationData.longitude!),
-      zoom: 14,
-    );
-    mapController?.animateCamera(
-      CameraUpdate.newCameraPosition(cameraPosition),
-    );
+    if (isFirstTime) {
+      var cameraPosition = CameraPosition(
+        target: LatLng(locationData.latitude!, locationData.longitude!),
+        zoom: 17,
+      );
+      mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(cameraPosition),
+      );
+      isFirstTime = false;
+    } else {
+      mapController?.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(locationData.latitude!, locationData.longitude!),
+        ),
+      );
+    }
   }
 
   void setLocationMarker(LocationData locationData) {
