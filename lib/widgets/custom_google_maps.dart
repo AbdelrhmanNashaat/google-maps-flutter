@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:maps/models/location_services.dart';
 import 'package:maps/models/place_model.dart';
 import 'dart:ui' as ui;
 
@@ -13,12 +15,13 @@ class CustomGoogleMap extends StatefulWidget {
 
 class _CustomGoogleMapState extends State<CustomGoogleMap> {
   late CameraPosition initialCameraPosition;
-  late GoogleMapController mapController;
+  GoogleMapController? mapController;
+  late LocationServices locationServices;
   @override
   void initState() {
     // initialCameraPosition is the initial position of the camera when the map is loaded
     initialCameraPosition = const CameraPosition(
-      target: LatLng(30.112378534699047, 31.343872088042776),
+      target: LatLng(30.112389461758138, 31.343841994108537),
       // zoom level of the map when it is loaded
       /* zoom levels :
     1) World view zoom : 0 => 3
@@ -27,18 +30,20 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
     4) street view zoom : 13 => 17
     5) building view zoom : 18 => 20
     */
-      zoom: 12,
+      zoom: 14,
     );
-    initMarkers();
+    // initMarkers();
     initPolyLines();
     initPolygons();
     initCircles();
+    locationServices = LocationServices();
+    voidUpdateMyLocation();
     super.initState();
   }
 
   @override
   void dispose() {
-    mapController.dispose();
+    mapController!.dispose();
     super.dispose();
   }
 
@@ -118,8 +123,8 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
       polylineId: PolylineId('1'),
       color: Colors.purple,
       points: [
-        LatLng(30.12848429643792, 31.65431208748853),
-        LatLng(30.117651271146364, 31.667823057499746),
+        LatLng(30.11235336118366, 31.398796559131704),
+        LatLng(30.134088728528685, 31.384617820445133),
       ],
     );
     polylines.add(polyline);
@@ -130,11 +135,11 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
       // we can use holes to create a polygon with a hole in the middle
       polygonId: const PolygonId('1'),
       points: const [
-        LatLng(30.10345409626631, 31.337994882058638),
-        LatLng(30.103899618935085, 31.302031824997105),
-        LatLng(30.14458221838534, 31.320056269018508),
-        LatLng(30.133596599034323, 31.38460094473021),
-        LatLng(30.10345409626631, 31.337994882058638),
+        LatLng(30.119600460915482, 31.340210283244776),
+        LatLng(30.1181898565391, 31.361324631832577),
+        LatLng(30.1149973614822, 31.317894305166384),
+        LatLng(30.133557054702283, 31.32328748709566),
+        LatLng(30.119600460915482, 31.340210283244776),
       ],
       strokeWidth: 2,
       strokeColor: Colors.red,
@@ -147,11 +152,44 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
     Circle circle = Circle(
       circleId: const CircleId('1'),
       center: const LatLng(30.092455778679195, 31.347928443506724),
-      radius: 1000,
+      radius: 500,
       strokeWidth: 2,
       strokeColor: Colors.red,
       fillColor: Colors.deepPurple.withOpacity(0.5),
     );
     circles.add(circle);
+  }
+
+  void voidUpdateMyLocation() async {
+    await locationServices.checkAndRequestLocationServices();
+    var hasPermission =
+        await locationServices.checkAndRequestPermissionStatus();
+    if (hasPermission) {
+      locationServices.getRealTimeData(
+        onData: (locationData) {
+          setLocationMarker(locationData);
+          animateCamera(locationData);
+        },
+      );
+    }
+  }
+
+  void animateCamera(LocationData locationData) {
+    var cameraPosition = CameraPosition(
+      target: LatLng(locationData.latitude!, locationData.longitude!),
+      zoom: 14,
+    );
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(cameraPosition),
+    );
+  }
+
+  void setLocationMarker(LocationData locationData) {
+    var locationMarker = Marker(
+      markerId: const MarkerId('myLocation'),
+      position: LatLng(locationData.latitude!, locationData.longitude!),
+    );
+    markers.add(locationMarker);
+    setState(() {});
   }
 }
